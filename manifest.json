@@ -1,0 +1,36 @@
+{
+  "_comment": "A LISTA de itens instaláveis. type: skill | home-file | settings-merge.",
+  "items": [
+    {
+      "id": "parzinho",
+      "type": "skill",
+      "source": "skills/parzinho",
+      "description": "Modo de pareamento iterativo item-a-item, com controle em tmp/modificacoes.md",
+      "default": true
+    },
+    {
+      "id": "estilo-resposta",
+      "type": "home-file",
+      "source": "home/CLAUDE.md",
+      "dest": ".claude/CLAUDE.md",
+      "description": "Instruções globais do Claude Code: estilo de resposta (pt-BR, sem bajulação)",
+      "default": true
+    },
+    {
+      "id": "rtk-doc",
+      "type": "home-file",
+      "source": "home/RTK.md",
+      "dest": ".claude/RTK.md",
+      "description": "Referência do RTK (Rust Token Killer), incluída via @RTK.md no CLAUDE.md",
+      "default": true
+    },
+    {
+      "id": "settings",
+      "type": "settings-merge",
+      "source": "home/settings.fragment.json",
+      "dest": ".claude/settings.json",
+      "description": "Merge no settings.json: hook do RTK, language pt-BR, theme, spinnerVerbs",
+      "default": true
+    }
+  ]
+}

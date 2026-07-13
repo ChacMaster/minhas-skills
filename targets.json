@@ -1,0 +1,25 @@
+{
+  "_comment": "Mapa agente -> diretório de skills. 'detect' é o diretório cuja existência prova que o agente está instalado nesta máquina; se não existir, o agente é pulado (autodetecção). Paths verificados em macOS.",
+  "agents": {
+    "claude": {
+      "detect": "~/.claude",
+      "global": "~/.claude/skills",
+      "project": ".claude/skills"
+    },
+    "codex": {
+      "detect": "~/.codex",
+      "global": "~/.codex/skills",
+      "project": ".codex/skills"
+    },
+    "cursor": {
+      "detect": "~/.cursor",
+      "global": "~/.cursor/skills-cursor",
+      "project": ".cursor/skills-cursor"
+    },
+    "opencode": {
+      "detect": "~/.config/opencode",
+      "global": "~/.config/opencode/skill",
+      "project": ".opencode/skill"
+    }
+  }
+}

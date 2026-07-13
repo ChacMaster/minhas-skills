@@ -1,0 +1,67 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rtk hook claude"
+          }
+        ]
+      }
+    ]
+  },
+  "language": "Portugues Brasil",
+  "theme": "dark",
+  "spinnerVerbs": {
+    "mode": "replace",
+    "verbs": [
+      "Entrando fundo no código",
+      "Metendo a mão na massa",
+      "Dando duro pra você",
+      "Trabalhando embaixo do capô",
+      "Explorando cada buraco",
+      "Enfiando o dedo no bug",
+      "Metendo bronca",
+      "Penetrando na stack",
+      "Subindo aos poucos",
+      "Botando pra dentro",
+      "Indo até o fim",
+      "Aumentando o ritmo",
+      "Chegando lá",
+      "Suando pra caramba",
+      "Batendo forte no teclado",
+      "Punhado de commits",
+      "Dando uma mãozinha",
+      "Segurando as pontas",
+      "Aguentando firme",
+      "Ficando molhado de suor",
+      "Cavando fundo",
+      "Fazendo vai e vem",
+      "Colocando pra funcionar",
+      "Encaixando direitinho",
+      "Testando a resistência",
+      "Forçando um pouco mais",
+      "Preenchendo os espaços",
+      "Deixando bem apertado",
+      "Puxando o gatilho",
+      "Terminando rápido",
+      "Segurando mais um pouco",
+      "Trabalhando por trás",
+      "Executando por trás",
+      "Lubrificando o pipeline",
+      "Injetando dependências",
+      "Fazendo o hot reload",
+      "Rodando em cima",
+      "Montando tudo",
+      "Desmontando devagar",
+      "Expandindo o contexto",
+      "Comprimindo até caber",
+      "Inserindo no final",
+      "Empurrando pra main",
+      "Puxando de você",
+      "Mergeando gostoso"
+    ]
+  }
+}
