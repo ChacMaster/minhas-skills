@@ -74,6 +74,14 @@ command -v jq >/dev/null 2>&1 || die "jq não encontrado. Instale com: brew inst
 
 # ---------------------------------------------------------------- helpers
 
+# SO atual — usado pelo campo "os" do manifest (itens específicos de plataforma).
+case "$(uname -s)" in
+  Darwin) OS=macos ;;
+  Linux)  OS=linux ;;
+  MINGW*|MSYS*|CYGWIN*) OS=windows ;;
+  *) OS=unknown ;;
+esac
+
 expand_tilde() { case "$1" in "~/"*) printf '%s' "$HOME/${1#\~/}" ;; *) printf '%s' "$1" ;; esac; }
 
 # Caminho relativo de $2 (alvo) a partir do diretório $1. Bash puro — sem realpath/python.
@@ -88,6 +96,10 @@ relpath() {
   if [ "$to" = "$from" ]; then printf '%s' "${up%/}"
   else printf '%s%s' "$up" "${to#"$from"/}"; fi
 }
+
+TMPFILES=()
+cleanup() { [ ${#TMPFILES[@]} -gt 0 ] && rm -f "${TMPFILES[@]}"; return 0; }
+trap cleanup EXIT
 
 run() { if [ "$DRY_RUN" = 1 ]; then printf '  %s[dry-run]%s %s\n' "$DIM" "$RST" "$*"; else "$@"; fi; }
 
@@ -217,8 +229,10 @@ install_skill() {
 }
 
 install_home_file() {
-  local id="$1" src="$REPO/$2" dst="$BASE/$3"
+  local id="$1" src="$REPO/$2" dst="$BASE/$3" is_exec="${4:-false}"
   [ -f "$src" ] || die "arquivo não encontrado: $src"
+
+  [ "$is_exec" = true ] && [ ! -x "$src" ] && run chmod +x "$src"
 
   if [ "$MODE" = symlink ] && [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
     skip "$3 (symlink já correto)"; return
@@ -226,13 +240,24 @@ install_home_file() {
   run mkdir -p "$(dirname "$dst")"
   backup "$dst"
   if [ "$MODE" = symlink ]; then run ln -s "$src" "$dst"; ok "$3 → $src"
-  else run cp "$src" "$dst"; ok "$3 (cópia)"; fi
+  else
+    run cp "$src" "$dst"
+    [ "$is_exec" = true ] && run chmod +x "$dst"
+    ok "$3 (cópia)"
+  fi
 }
 
 install_settings_merge() {
   local id="$1" src="$REPO/$2" dst="$BASE/$3"
   [ -f "$src" ] || die "fragmento não encontrado: $src"
   run mkdir -p "$(dirname "$dst")"
+
+  # {{BASE}} no fragmento vira o diretório de instalação (\$HOME ou o projeto).
+  if grep -q '{{BASE}}' "$src"; then
+    local resolved; resolved="$(mktemp)"; TMPFILES+=("$resolved")
+    sed "s|{{BASE}}|${BASE}|g" "$src" > "$resolved"
+    src="$resolved"
+  fi
 
   local current merged
   if [ -f "$dst" ]; then
@@ -265,12 +290,20 @@ for id in "${SELECTED[@]}"; do
   type="$(jq -r --arg i "$id" '.items[] | select(.id==$i) | .type'   "$MANIFEST")"
   src="$( jq -r --arg i "$id" '.items[] | select(.id==$i) | .source' "$MANIFEST")"
   dest="$(jq -r --arg i "$id" '.items[] | select(.id==$i) | .dest // ""' "$MANIFEST")"
+  isexec="$(jq -r --arg i "$id" '.items[] | select(.id==$i) | .exec // false' "$MANIFEST")"
+  oses="$(jq -r --arg i "$id" '.items[] | select(.id==$i) | (.os // []) | join(" ")' "$MANIFEST")"
 
   info ""
   info "${B}▸ $id${RST} ${DIM}($type)${RST}"
+
+  if [ -n "$oses" ] && ! printf '%s\n' $oses | grep -qx "$OS"; then
+    skip "não suportado neste SO ($OS) — suportados: $oses"
+    continue
+  fi
+
   case "$type" in
     skill)          install_skill        "$id" "$src" ;;
-    home-file)      install_home_file    "$id" "$src" "$dest" ;;
+    home-file)      install_home_file    "$id" "$src" "$dest" "$isexec" ;;
     settings-merge) install_settings_merge "$id" "$src" "$dest" ;;
     *) die "tipo desconhecido no manifest: $type" ;;
   esac

@@ -1,5 +1,5 @@
 {
-  "_comment": "A LISTA de itens instaláveis. type: skill | home-file | settings-merge.",
+  "_comment": "A LISTA de itens instaláveis. type: skill | home-file | settings-merge. Campos opcionais: exec (chmod +x no destino), os (lista de SOs suportados: macos|linux|windows; ausente = todos).",
   "items": [
     {
       "id": "parzinho",
@@ -22,6 +22,24 @@
       "source": "home/RTK.md",
       "dest": ".claude/RTK.md",
       "description": "Referência do RTK (Rust Token Killer), incluída via @RTK.md no CLAUDE.md",
+      "default": true
+    },
+    {
+      "id": "statusline",
+      "type": "home-file",
+      "source": "home/statusline-command.sh",
+      "dest": ".claude/statusline-command.sh",
+      "exec": true,
+      "os": ["macos", "linux"],
+      "description": "Script da status line: modelo, effort, branch, uso do contexto e tokens (macOS/Linux)",
+      "default": true
+    },
+    {
+      "id": "statusline-settings",
+      "type": "settings-merge",
+      "source": "home/statusline.fragment.json",
+      "dest": ".claude/settings.json",
+      "description": "Aponta o settings.json para o script da status line",
       "default": true
     },
     {

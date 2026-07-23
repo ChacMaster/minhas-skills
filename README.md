@@ -52,11 +52,32 @@ repo/skills/parzinho ──(symlink ou cópia)──> ~/.agents/skills/parzinho
 | `parzinho` | skill | Modo de pareamento iterativo item-a-item, com controle em `tmp/modificacoes.md` |
 | `estilo-resposta` | home-file | `~/.claude/CLAUDE.md` — estilo de resposta (pt-BR, sem bajulação) |
 | `rtk-doc` | home-file | `~/.claude/RTK.md` — referência do RTK |
+| `statusline` | home-file | `~/.claude/statusline-command.sh` — status line: modelo, effort, branch, uso do contexto e tokens (**macOS/Linux**) |
+| `statusline-settings` | settings-merge | Aponta a chave `statusLine` do `settings.json` para o script acima |
 | `settings` | settings-merge | Merge em `~/.claude/settings.json`: hook do RTK, language, theme, spinnerVerbs |
 
 Nada é sobrescrito sem backup (`<arquivo>.bak.<timestamp>`). O `settings.json` recebe
 **merge seletivo**: as chaves do fragmento vencem, todo o resto da sua config local sobrevive.
 Rodar o instalador duas vezes é seguro — ele detecta o que já está correto e pula.
+
+## Status line
+
+O item `statusline` instala um script que renderiza a barra de status do Claude Code:
+
+```
+Opus 4.8 | Effort: low | main | ctx: 12% | tokens: 52.8k
+```
+
+Cores: contexto verde até 50%, amarelo até 80%, vermelho acima. Requer `jq` e `awk`.
+Hoje só há versão **macOS/Linux** (bash) — o campo `"os"` no `manifest.json` faz o instalador
+pular o item em plataformas não suportadas. Para Windows, acrescente um item novo
+(ex.: `statusline-win`, PowerShell) com `"os": ["windows"]`.
+
+Instalar só a status line:
+
+```bash
+./install.sh --only statusline,statusline-settings --scope global --mode symlink -y
+```
 
 ## Adicionar uma skill nova
 
@@ -64,6 +85,11 @@ Rodar o instalador duas vezes é seguro — ele detecta o que já está correto 
    que faz o agente decidir invocar a skill — descreva os gatilhos reais).
 2. Adicione a entrada correspondente em `manifest.json` (`"type": "skill"`).
 3. Commit, push, e nas outras máquinas: `git pull` (modo symlink) ou `./install.sh` (modo cópia).
+
+Campos opcionais do manifest: `"exec": true` (marca o destino como executável) e
+`"os": ["macos","linux"]` (restringe o item a certas plataformas). Em fragmentos de
+`settings-merge`, o placeholder `{{BASE}}` é substituído pelo diretório de instalação
+(`$HOME` no escopo global, o projeto no escopo project).
 
 ## Adicionar suporte a outro agente
 
